@@ -9,6 +9,7 @@ from typing import Any
 import httpx
 import pandas as pd
 from fastapi import FastAPI, File, Form, Request, UploadFile
+from httpx import HTTPError
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -217,12 +218,27 @@ async def classify(
 
     df = df.fillna("")
     results = []
-    async with httpx.AsyncClient() as client:
-        for _, row in df.iterrows():
-            row_dict = row.to_dict()
-            row_dict["data"] = _safe_date(row_dict.get("data"))
-            result = await _classify_ticket(client, row_dict)
-            results.append({**row_dict, **result})
+    try:
+        async with httpx.AsyncClient() as client:
+            for _, row in df.iterrows():
+                row_dict = row.to_dict()
+                row_dict["data"] = _safe_date(row_dict.get("data"))
+                result = await _classify_ticket(client, row_dict)
+                results.append({**row_dict, **result})
+    except HTTPError as exc:
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "app_title": APP_TITLE,
+                "default_model": OLLAMA_MODEL,
+                "error": (
+                    "Não foi possível consultar o Ollama. "
+                    "Verifique se o serviço está ativo e se o modelo foi baixado. "
+                    f"Detalhes: {exc}"
+                ),
+            },
+        )
 
     return templates.TemplateResponse(
         "results.html",

@@ -44,6 +44,10 @@ O CSV/XLSX precisa ter as seguintes colunas (podem estar em minúsculo ou com ac
   - `acao` → ação recomendada para o ticket
   - `grupo` → rótulo para agrupar tickets similares
 
+## 🧩 Solução de problemas
+
+- **Erro ao classificar (Ollama 404/indisponível):** aguarde alguns segundos após o `docker-compose up --build` para o serviço `ollama` ficar saudável e o modelo ser baixado pelo `ollama-init`. Reabra a página e tente novamente.
+
 ## 🧠 Trocar o modelo
 
 Se você quiser usar outro modelo, basta editar a variável no formulário da tela inicial ou alterar no `docker-compose.yml`:

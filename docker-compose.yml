@@ -7,7 +7,8 @@ services:
       OLLAMA_URL: http://ollama:11434
       OLLAMA_MODEL: llama3.1
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
 
   ollama:
     image: ollama/ollama:latest
@@ -18,6 +19,11 @@ services:
     environment:
       OLLAMA_MODEL: llama3.1
     command: ["serve"]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ollama-init:
     image: ollama/ollama:latest
