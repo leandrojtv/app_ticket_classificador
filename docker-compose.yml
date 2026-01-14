@@ -28,14 +28,19 @@ services:
   ollama-init:
     image: ollama/ollama:latest
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
     volumes:
       - ollama_data:/root/.ollama
     environment:
       OLLAMA_HOST: http://ollama:11434
       OLLAMA_MODEL: llama3.1
     entrypoint: ["/bin/sh", "-c"]
-    command: "while ! ollama list >/dev/null 2>&1; do sleep 2; done; ollama pull ${OLLAMA_MODEL}"
+    command: >
+      i=0; while [ $i -lt 5 ]; do
+        ollama pull ${OLLAMA_MODEL} && exit 0;
+        i=$((i+1)); sleep 3;
+      done; exit 1
     restart: on-failure
 
 volumes:
