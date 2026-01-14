@@ -71,7 +71,7 @@ async def _classify_ticket(client: httpx.AsyncClient, row: dict[str, Any]) -> di
     prompt = (
         "Você é um assistente de suporte que classifica tickets. "
         "Analise a descrição e responda apenas em JSON com as chaves "
-        '"acao" e "grupo". "
+        '"acao" e "grupo". '
         "A ação deve ser curta (ex: 'encaminhar para TI', 'prioridade alta', "
         "'responder com template', 'escalar para liderança'). "
         "O grupo deve ser um rótulo curto para agrupar tickets similares.\n\n"
