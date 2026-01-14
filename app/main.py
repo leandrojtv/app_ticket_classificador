@@ -235,6 +235,7 @@ async def classify(
                 "error": (
                     "Não foi possível consultar o Ollama. "
                     "Verifique se o serviço está ativo e se o modelo foi baixado. "
+                    f"URL: {OLLAMA_URL} · Modelo: {OLLAMA_MODEL}. "
                     f"Detalhes: {exc}"
                 ),
             },

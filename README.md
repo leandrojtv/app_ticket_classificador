@@ -47,6 +47,7 @@ O CSV/XLSX precisa ter as seguintes colunas (podem estar em minúsculo ou com ac
 ## 🧩 Solução de problemas
 
 - **Erro ao classificar (Ollama 404/indisponível):** aguarde alguns segundos após o `docker-compose up --build` para o serviço `ollama` ficar saudável e o modelo ser baixado pelo `ollama-init`. Reabra a página e tente novamente.
+- **Erro 404 indicando modelo não encontrado:** confirme se o serviço `ollama-init` finalizou o download do modelo e se o nome do modelo no formulário bate com `OLLAMA_MODEL`.
 
 ## 🧠 Trocar o modelo
 
