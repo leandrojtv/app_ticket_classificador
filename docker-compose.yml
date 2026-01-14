@@ -17,8 +17,9 @@ services:
       - ollama_data:/root/.ollama
     environment:
       OLLAMA_MODEL: llama3.1
+    entrypoint: ["bash", "-lc"]
     command: >
-      bash -lc "ollama serve & sleep 2 && ollama pull ${OLLAMA_MODEL} && wait -n"
+      ollama serve & sleep 2 && ollama pull ${OLLAMA_MODEL} && wait -n
 
 volumes:
   ollama_data:
