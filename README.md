@@ -27,6 +27,7 @@ O Docker Compose já sobe a aplicação web e o Ollama, além de baixar automati
 
 4. **Faça o mapeamento das colunas**
    - Após enviar o CSV/XLSX, selecione quais colunas do arquivo correspondem a **ticket, descrição, data e autor**.
+   - Caso seu Ollama esteja rodando localmente fora do Docker, informe a URL no campo **URL do Ollama**.
 
 ## 📄 Formato do arquivo
 

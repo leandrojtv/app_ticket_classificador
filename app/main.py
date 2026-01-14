@@ -33,6 +33,7 @@ async def index(request: Request) -> HTMLResponse:
             "request": request,
             "app_title": APP_TITLE,
             "default_model": OLLAMA_MODEL,
+            "default_ollama_url": OLLAMA_URL,
         },
     )
 
@@ -99,14 +100,17 @@ async def classify(
     request: Request,
     arquivo: UploadFile | None = File(None),
     modelo: str = Form(OLLAMA_MODEL),
+    ollama_url: str | None = Form(None),
     token: str | None = Form(None),
     coluna_ticket: str | None = Form(None),
     coluna_descricao: str | None = Form(None),
     coluna_data: str | None = Form(None),
     coluna_autor: str | None = Form(None),
 ) -> HTMLResponse:
-    global OLLAMA_MODEL
+    global OLLAMA_MODEL, OLLAMA_URL
     OLLAMA_MODEL = modelo
+    if ollama_url:
+        OLLAMA_URL = ollama_url
 
     if token is None:
         if arquivo is None:
@@ -139,13 +143,18 @@ async def classify(
             )
 
         token = uuid.uuid4().hex
-        FILE_STORE[token] = {"data": data, "filename": filename}
+        FILE_STORE[token] = {
+            "data": data,
+            "filename": filename,
+            "ollama_url": OLLAMA_URL,
+        }
         return templates.TemplateResponse(
             "mapping.html",
             {
                 "request": request,
                 "app_title": APP_TITLE,
                 "default_model": OLLAMA_MODEL,
+                "default_ollama_url": OLLAMA_URL,
                 "token": token,
                 "columns": list(df.columns),
             },
@@ -165,6 +174,8 @@ async def classify(
 
     data = stored["data"]
     filename = str(stored["filename"])
+    if "ollama_url" in stored:
+        OLLAMA_URL = str(stored["ollama_url"])
     try:
         df = _load_dataframe(data, filename)
     except (pd.errors.ParserError, UnicodeDecodeError) as exc:
@@ -197,6 +208,7 @@ async def classify(
                 "default_model": OLLAMA_MODEL,
                 "token": token,
                 "columns": list(df.columns),
+                "default_ollama_url": OLLAMA_URL,
                 "error": "Selecione todas as colunas obrigatórias antes de continuar.",
             },
         )
