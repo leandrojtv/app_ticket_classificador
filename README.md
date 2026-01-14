@@ -23,11 +23,11 @@ Aplicação web simples para carregar um CSV/XLSX com **número do ticket, descr
 3. **Acesse no navegador**
    - http://localhost:8000
 
-O Docker Compose sobe apenas a aplicação web. Garanta que sua instância do Ollama esteja rodando separadamente (ex: em `http://localhost:11434`).
+O Docker Compose sobe apenas a aplicação web. Garanta que sua instância do Ollama esteja rodando separadamente (ex: em `http://localhost:11434`). Dentro do container, o endereço padrão é `http://host.docker.internal:11434`.
 
 4. **Faça o mapeamento das colunas**
    - Após enviar o CSV/XLSX, selecione quais colunas do arquivo correspondem a **ticket, descrição, data e autor**.
-   - Caso seu Ollama esteja rodando localmente fora do Docker, informe a URL no campo **URL do Ollama**.
+   - Caso seu Ollama esteja rodando localmente fora do Docker, informe a URL no campo **URL do Ollama** (use `http://host.docker.internal:11434` quando a aplicação estiver em container).
 
 ## 📄 Formato do arquivo
 

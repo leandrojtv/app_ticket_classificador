@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 APP_TITLE = "Classificador de Tickets"
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
 
 app = FastAPI(title=APP_TITLE)
@@ -36,6 +36,15 @@ async def index(request: Request) -> HTMLResponse:
             "default_ollama_url": OLLAMA_URL,
         },
     )
+
+
+def _normalize_ollama_url(url: str) -> str:
+    normalized = url.strip()
+    if normalized.endswith("/api/generate"):
+        normalized = normalized[: -len("/api/generate")]
+    if normalized.endswith("/api"):
+        normalized = normalized[: -len("/api")]
+    return normalized.rstrip("/")
 
 
 def _load_dataframe(data: bytes, filename: str) -> pd.DataFrame:
@@ -110,7 +119,7 @@ async def classify(
     global OLLAMA_MODEL, OLLAMA_URL
     OLLAMA_MODEL = modelo
     if ollama_url:
-        OLLAMA_URL = ollama_url
+        OLLAMA_URL = _normalize_ollama_url(ollama_url)
 
     if token is None:
         if arquivo is None:
@@ -175,7 +184,7 @@ async def classify(
     data = stored["data"]
     filename = str(stored["filename"])
     if "ollama_url" in stored:
-        OLLAMA_URL = str(stored["ollama_url"])
+        OLLAMA_URL = _normalize_ollama_url(str(stored["ollama_url"]))
     try:
         df = _load_dataframe(data, filename)
     except (pd.errors.ParserError, UnicodeDecodeError) as exc:
