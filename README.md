@@ -23,7 +23,7 @@ Aplicação web simples para carregar um CSV/XLSX com **número do ticket, descr
 3. **Acesse no navegador**
    - http://localhost:8000
 
-O Docker Compose já sobe a aplicação web e o Ollama, além de baixar automaticamente o modelo `llama3.1` na primeira execução.
+O Docker Compose já sobe a aplicação web e o Ollama, além de baixar automaticamente o modelo `llama3.1` na primeira execução (via serviço `ollama-init`).
 
 ## 📄 Formato do arquivo
 
