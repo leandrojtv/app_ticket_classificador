@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ app_title }}</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>{{ app_title }}</h1>
+      <p class="subtitle">Envie um CSV ou XLSX com número do ticket, descrição, data e autor.</p>
+    </header>
+
+    {% if error %}
+      <div class="alert">{{ error }}</div>
+    {% endif %}
+
+    <form class="card" action="/classificar" method="post" enctype="multipart/form-data">
+      <label class="field">
+        <span>Arquivo (CSV/XLSX)</span>
+        <input type="file" name="arquivo" accept=".csv,.xlsx" required />
+      </label>
+      <label class="field">
+        <span>Modelo Ollama</span>
+        <input type="text" name="modelo" value="{{ default_model }}" />
+      </label>
+      <button type="submit">Classificar tickets</button>
+    </form>
+
+    <section class="tips">
+      <h2>Formato esperado</h2>
+      <ul>
+        <li>numero do ticket</li>
+        <li>descrição</li>
+        <li>data</li>
+        <li>autor</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
