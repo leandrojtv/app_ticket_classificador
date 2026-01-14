@@ -25,6 +25,9 @@ Aplicação web simples para carregar um CSV/XLSX com **número do ticket, descr
 
 O Docker Compose já sobe a aplicação web e o Ollama, além de baixar automaticamente o modelo `llama3.1` na primeira execução (via serviço `ollama-init`, que compartilha o volume de modelos).
 
+4. **Faça o mapeamento das colunas**
+   - Após enviar o CSV/XLSX, selecione quais colunas do arquivo correspondem a **ticket, descrição, data e autor**.
+
 ## 📄 Formato do arquivo
 
 O CSV/XLSX precisa ter as seguintes colunas (podem estar em minúsculo ou com acentos):

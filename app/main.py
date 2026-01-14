@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import os
+import uuid
 from datetime import datetime
 from typing import Any
 
@@ -20,6 +21,7 @@ app = FastAPI(title=APP_TITLE)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+FILE_STORE: dict[str, dict[str, bytes | str]] = {}
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -34,9 +36,7 @@ async def index(request: Request) -> HTMLResponse:
     )
 
 
-def _load_dataframe(upload: UploadFile) -> pd.DataFrame:
-    data = upload.file.read()
-    filename = upload.filename or ""
+def _load_dataframe(data: bytes, filename: str) -> pd.DataFrame:
     if filename.lower().endswith(".xlsx"):
         df = pd.read_excel(io.BytesIO(data))
     else:
@@ -96,14 +96,76 @@ def _safe_date(value: Any) -> str:
 @app.post("/classificar", response_class=HTMLResponse)
 async def classify(
     request: Request,
-    arquivo: UploadFile = File(...),
+    arquivo: UploadFile | None = File(None),
     modelo: str = Form(OLLAMA_MODEL),
+    token: str | None = Form(None),
+    coluna_ticket: str | None = Form(None),
+    coluna_descricao: str | None = Form(None),
+    coluna_data: str | None = Form(None),
+    coluna_autor: str | None = Form(None),
 ) -> HTMLResponse:
     global OLLAMA_MODEL
     OLLAMA_MODEL = modelo
 
+    if token is None:
+        if arquivo is None:
+            return templates.TemplateResponse(
+                "index.html",
+                {
+                    "request": request,
+                    "app_title": APP_TITLE,
+                    "default_model": OLLAMA_MODEL,
+                    "error": "Envie um arquivo CSV ou XLSX para iniciar o mapeamento.",
+                },
+            )
+        data = arquivo.file.read()
+        filename = arquivo.filename or ""
+        try:
+            df = _load_dataframe(data, filename)
+        except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+            return templates.TemplateResponse(
+                "index.html",
+                {
+                    "request": request,
+                    "app_title": APP_TITLE,
+                    "default_model": OLLAMA_MODEL,
+                    "error": (
+                        "Não foi possível ler o arquivo enviado. "
+                        "Verifique se o CSV/XLSX está no formato correto. "
+                        f"Detalhes: {exc}"
+                    ),
+                },
+            )
+
+        token = uuid.uuid4().hex
+        FILE_STORE[token] = {"data": data, "filename": filename}
+        return templates.TemplateResponse(
+            "mapping.html",
+            {
+                "request": request,
+                "app_title": APP_TITLE,
+                "default_model": OLLAMA_MODEL,
+                "token": token,
+                "columns": list(df.columns),
+            },
+        )
+
+    stored = FILE_STORE.get(token)
+    if not stored:
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "app_title": APP_TITLE,
+                "default_model": OLLAMA_MODEL,
+                "error": "Não foi possível localizar o arquivo para mapeamento. Envie novamente.",
+            },
+        )
+
+    data = stored["data"]
+    filename = str(stored["filename"])
     try:
-        df = _load_dataframe(arquivo)
+        df = _load_dataframe(data, filename)
     except (pd.errors.ParserError, UnicodeDecodeError) as exc:
         return templates.TemplateResponse(
             "index.html",
@@ -118,6 +180,28 @@ async def classify(
                 ),
             },
         )
+
+    mapping = {
+        "ticket": coluna_ticket,
+        "descricao": coluna_descricao,
+        "data": coluna_data,
+        "autor": coluna_autor,
+    }
+    if not all(mapping.values()):
+        return templates.TemplateResponse(
+            "mapping.html",
+            {
+                "request": request,
+                "app_title": APP_TITLE,
+                "default_model": OLLAMA_MODEL,
+                "token": token,
+                "columns": list(df.columns),
+                "error": "Selecione todas as colunas obrigatórias antes de continuar.",
+            },
+        )
+
+    rename_map = {value: key for key, value in mapping.items() if value}
+    df = df.rename(columns=rename_map)
     df = _normalize_columns(df)
     missing = _validate_columns(df)
     if missing:
