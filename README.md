@@ -23,7 +23,7 @@ Aplicação web simples para carregar um CSV/XLSX com **número do ticket, descr
 3. **Acesse no navegador**
    - http://localhost:8000
 
-O Docker Compose já sobe a aplicação web e o Ollama, além de baixar automaticamente o modelo `llama3.1` na primeira execução (via serviço `ollama-init`, que compartilha o volume de modelos).
+O Docker Compose sobe apenas a aplicação web. Garanta que sua instância do Ollama esteja rodando separadamente (ex: em `http://localhost:11434`).
 
 4. **Faça o mapeamento das colunas**
    - Após enviar o CSV/XLSX, selecione quais colunas do arquivo correspondem a **ticket, descrição, data e autor**.
@@ -47,9 +47,7 @@ O CSV/XLSX precisa ter as seguintes colunas (podem estar em minúsculo ou com ac
 
 ## 🧩 Solução de problemas
 
-- **Erro ao classificar (Ollama 404/indisponível):** aguarde alguns segundos após o `docker-compose up --build` para o serviço `ollama` ficar saudável e o modelo ser baixado pelo `ollama-init`. Reabra a página e tente novamente.
-- **Erro 404 indicando modelo não encontrado:** confirme se o serviço `ollama-init` finalizou o download do modelo e se o nome do modelo no formulário bate com `OLLAMA_MODEL`.
-- **/api/tags retorna vazio:** rode `docker compose logs ollama-init` para confirmar o pull e, se necessário, execute `docker compose run --rm ollama-init` ou `docker compose exec ollama ollama pull llama3.1`.
+- **Erro ao classificar (Ollama 404/indisponível):** verifique se o Ollama está rodando na URL configurada (campo **URL do Ollama**) e se o modelo foi baixado na sua instância.
 
 ## 🧠 Trocar o modelo
 
