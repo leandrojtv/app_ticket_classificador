@@ -40,7 +40,7 @@ def _load_dataframe(upload: UploadFile) -> pd.DataFrame:
     if filename.lower().endswith(".xlsx"):
         df = pd.read_excel(io.BytesIO(data))
     else:
-        df = pd.read_csv(io.BytesIO(data))
+        df = pd.read_csv(io.BytesIO(data), sep=None, engine="python")
     return df
 
 
@@ -102,7 +102,22 @@ async def classify(
     global OLLAMA_MODEL
     OLLAMA_MODEL = modelo
 
-    df = _load_dataframe(arquivo)
+    try:
+        df = _load_dataframe(arquivo)
+    except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "app_title": APP_TITLE,
+                "default_model": OLLAMA_MODEL,
+                "error": (
+                    "Não foi possível ler o arquivo enviado. "
+                    "Verifique se o CSV/XLSX está no formato correto. "
+                    f"Detalhes: {exc}"
+                ),
+            },
+        )
     df = _normalize_columns(df)
     missing = _validate_columns(df)
     if missing:

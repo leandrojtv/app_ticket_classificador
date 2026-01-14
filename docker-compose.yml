@@ -23,12 +23,13 @@ services:
     image: ollama/ollama:latest
     depends_on:
       - ollama
+    volumes:
+      - ollama_data:/root/.ollama
     environment:
       OLLAMA_HOST: http://ollama:11434
       OLLAMA_MODEL: llama3.1
-    entrypoint: ["bash", "-lc"]
-    command: >
-      sleep 3 && ollama pull ${OLLAMA_MODEL}
+    entrypoint: ["sh", "-c"]
+    command: "sleep 3; ollama pull ${OLLAMA_MODEL}"
 
 volumes:
   ollama_data:
