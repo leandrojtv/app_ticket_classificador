@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ app_title }}</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>{{ app_title }}</h1>
+      <p class="subtitle">Mapeie as colunas do arquivo para os campos esperados.</p>
+    </header>
+
+    {% if error %}
+      <div class="alert">{{ error }}</div>
+    {% endif %}
+
+    <form class="card" action="/classificar" method="post">
+      <input type="hidden" name="token" value="{{ token }}" />
+      <label class="field">
+        <span>Modelo Ollama</span>
+        <input type="text" name="modelo" value="{{ default_model }}" />
+      </label>
+      <label class="field">
+        <span>URL do Ollama</span>
+        <input type="text" name="ollama_url" value="{{ default_ollama_url }}" />
+      </label>
+      <label class="field">
+        <span>Coluna para número do ticket</span>
+        <select name="coluna_ticket" required>
+          <option value="">Selecione...</option>
+          {% for col in columns %}
+            <option value="{{ col }}">{{ col }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Coluna para descrição</span>
+        <select name="coluna_descricao" required>
+          <option value="">Selecione...</option>
+          {% for col in columns %}
+            <option value="{{ col }}">{{ col }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Coluna para data</span>
+        <select name="coluna_data" required>
+          <option value="">Selecione...</option>
+          {% for col in columns %}
+            <option value="{{ col }}">{{ col }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Coluna para autor</span>
+        <select name="coluna_autor" required>
+          <option value="">Selecione...</option>
+          {% for col in columns %}
+            <option value="{{ col }}">{{ col }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button type="submit">Classificar tickets</button>
+    </form>
+  </main>
+</body>
+</html>

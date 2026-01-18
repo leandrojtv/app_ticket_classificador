@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ app_title }}</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>{{ app_title }}</h1>
+      <p class="subtitle">Modelo usado: {{ model }} · Total: {{ total }}</p>
+      <a class="link" href="/">Enviar novo arquivo</a>
+    </header>
+
+    <section class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket</th>
+            <th>Descrição</th>
+            <th>Data</th>
+            <th>Autor</th>
+            <th>Classificação (LLM)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in results %}
+          <tr>
+            <td>{{ item.ticket }}</td>
+            <td>{{ item.descricao }}</td>
+            <td>{{ item.data }}</td>
+            <td>{{ item.autor }}</td>
+            <td><pre>{{ item.raw }}</pre></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
